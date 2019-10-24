@@ -154,6 +154,7 @@ export function processLine(cm, text, context, startAt) {
   if (text == "") {
     // we need line number for blank lines as well
     context.state.blankLineNum = context.line
+    context.state.lineSeparatorLength = cm.doc.lineSeparator().length
     callBlankLine(mode, context.state)
   }
   while (!stream.eol()) {
@@ -226,6 +227,7 @@ function runMode(cm, text, mode, context, f, lineClasses, forceToEnd) {
   if (text == "") {
     // we need line number for blank lines as well
     context.state.blankLineNum = context.line
+    context.state.lineSeparatorLength = cm.doc.lineSeparator().length
     extractLineClasses(callBlankLine(mode, context.state), lineClasses)
   }
   while (!stream.eol()) {

@@ -131,8 +131,7 @@ export function getContextBefore(cm, n, precise) {
   let start = findStartLine(cm, n, precise)
   let saved = start > doc.first && getLine(doc, start - 1).stateAfter
   let context = saved ? Context.fromSaved(doc, saved, start) : new Context(doc, startState(doc.mode), start)
-
-  const realIndex = doc.indexFromPos()
+  
   context.setInstance(cm)
 
   doc.iter(start, n, line => {

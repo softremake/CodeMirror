@@ -20,6 +20,8 @@ class Context {
     this.maxLookAhead = lookAhead || 0
     this.baseTokens = null
     this.baseTokenPos = 1
+
+    this.instance = null // codemirror instance
   }
 
   lookAhead(n) {
@@ -52,6 +54,10 @@ class Context {
   save(copy) {
     let state = copy !== false ? copyState(this.doc.mode, this.state) : this.state
     return this.maxLookAhead > 0 ? new SavedContext(state, this.maxLookAhead) : state
+  }
+
+  setInstance(cm) {
+    this.instance = cm
   }
 }
 
@@ -126,6 +132,9 @@ export function getContextBefore(cm, n, precise) {
   let saved = start > doc.first && getLine(doc, start - 1).stateAfter
   let context = saved ? Context.fromSaved(doc, saved, start) : new Context(doc, startState(doc.mode), start)
 
+  const realIndex = doc.indexFromPos()
+  context.setInstance(cm)
+
   doc.iter(start, n, line => {
     processLine(cm, line.text, context)
     let pos = context.line
@@ -143,7 +152,11 @@ export function processLine(cm, text, context, startAt) {
   let mode = cm.doc.mode
   let stream = new StringStream(text, cm.options.tabSize, context)
   stream.start = stream.pos = startAt || 0
-  if (text == "") callBlankLine(mode, context.state)
+  if (text == "") {
+    // we need line number for blank lines as well
+    context.state.blankLineNum = context.line
+    callBlankLine(mode, context.state)
+  }
   while (!stream.eol()) {
     readToken(mode, stream, context.state)
     stream.start = stream.pos

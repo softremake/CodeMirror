@@ -131,7 +131,7 @@ export function getContextBefore(cm, n, precise) {
   let start = findStartLine(cm, n, precise)
   let saved = start > doc.first && getLine(doc, start - 1).stateAfter
   let context = saved ? Context.fromSaved(doc, saved, start) : new Context(doc, startState(doc.mode), start)
-  
+
   context.setInstance(cm)
 
   doc.iter(start, n, line => {
@@ -223,7 +223,11 @@ function runMode(cm, text, mode, context, f, lineClasses, forceToEnd) {
   let curStart = 0, curStyle = null
   let stream = new StringStream(text, cm.options.tabSize, context), style
   let inner = cm.options.addModeClass && [null]
-  if (text == "") extractLineClasses(callBlankLine(mode, context.state), lineClasses)
+  if (text == "") {
+    // we need line number for blank lines as well
+    context.state.blankLineNum = context.line
+    extractLineClasses(callBlankLine(mode, context.state), lineClasses)
+  }
   while (!stream.eol()) {
     if (stream.pos > cm.options.maxHighlightLength) {
       flattenSpans = false

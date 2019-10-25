@@ -21,7 +21,7 @@ class Context {
     this.baseTokens = null
     this.baseTokenPos = 1
 
-    this.instance = null // codemirror instance
+    this.instance = null // codemirror instance, https://github.com/codemirror/CodeMirror/issues/2032
   }
 
   lookAhead(n) {
